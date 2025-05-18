@@ -57,16 +57,15 @@ def modelling_with_tuning(data_path):
 if __name__ == "main":
 
     # konfigurasu dagshub
-    mlflow.set_tracking_uri("http://127.0.0.1:5000/")
-    """
+
     load_dotenv()
     dagshub_username = os.getenv('DAGSHUB_USERNAME')
     dagshub_token = os.getenv('DAGSHUB_TOKEN')
     if not dagshub_username or not dagshub_token:
         raise ValueError("DAGSHUB_USERNAME atau DAGSHUB_TOKEN tidak terdeteksi!")
     # Konfigurasi MLflow dengan autentikasi
-    mlflow.set_tracking_uri("https://dagshub.com/dk1781/heart_attack_mlflow.mlflow")
-    """
+    mlflow.set_tracking_uri("https://dagshub.com/dk1781/heart_attack_mlflow.mlflow/")
+    
     mlflow.set_experiment("HeartAttack_tuning")
     
     with mlflow.start_run(run_name="Modelling_tuning_manuallog"):
