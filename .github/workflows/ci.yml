@@ -19,6 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env: 
+      DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
       DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -45,6 +46,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas scikit-learn mlflow dagshub
 
+
+    # 5. Configure MLflow with Authentication
+      - name: Configure MLflow
+        run: |
+          export MLFLOW_TRACKING_URI="https://dagshub.com/dk1781/heart_attack_mlflow.mlflow"
+          export DAGSHUB_TOKEN="${DAGSHUB_TOKEN}"
+          export MLFLOW_TRACKING_USERNAME="${DAGSHUB_USERNAME}"
+          export MLFLOW_TRACKING_PASSWORD="${DAGSHUB_TOKEN}"
+  
 
       # 5. Run MLflow Project (ini akan menjalankan MLProject/modelling.py via MLproject spec)
       - name: Run mlflow project
