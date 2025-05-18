@@ -52,13 +52,19 @@ def modelling_with_tuning(data_path):
     return search, search.best_params_, metrics, (y_test, y_pred, y_proba)
 
 if __name__ == "__main__":
-    # konfigurasi DagsHub
+    # konfigurasu dagshub
+    dagshub_username = os.getenv('DAGSHUB_USERNAME')
+    dagshub_token = os.getenv('DAGSHUB_TOKEN')
+    
+    if not dagshub_username or not dagshub_token:
+        raise ValueError("DAGSHUB_USERNAME atau DAGSHUB_TOKEN tidak terdeteksi!")
+
     dagshub.init(
-        repo_owner='dk1781',               
+        repo_owner='dk1781',
         repo_name='heart_attack_mlflow',
         mlflow=True,
-        username=os.getenv('DAGSHUB_USERNAME'),
-        password=os.getenv('DAGSHUB_TOKEN')
+        username=dagshub_username,
+        password=dagshub_token
     )
     mlflow.set_experiment("HeartAttack_tuning")
 
@@ -74,4 +80,3 @@ if __name__ == "__main__":
         mlflow.sklearn.log_model(model, "randomforest_bestmodel")
 
         
-        y_test, y_pred, y_proba = preds
