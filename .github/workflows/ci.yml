@@ -11,7 +11,7 @@ on:
 env:
   EXPERIMENT_NAME: HeartAttack_tuning
   DATA_PATH: MLProject/heart_preprocessed.csv
-  MLFLOW_TRACKING_URI: "https://dagshub.com/dk1781/heart_attack_mlflow.mlflow"
+  MLFLOW_TRACKING_URI: "https://dagshub.com/dk1781/heart_attack_mlflow.mlflow/"
   DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}  
   DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
 
