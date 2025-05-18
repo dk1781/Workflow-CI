@@ -72,7 +72,7 @@ jobs:
           mlflow artifacts download \
             --run-id $RUN_ID \
             --artifact-path randomforest_bestmodel \
-            downloaded_artifact
+            --dst-path downloaded_artifact
       # 7. Upload MLflow artifacts (opsional, tapi memenuhi Skilled)
       - name: Upload MLflow artifacts
         uses: actions/upload-artifact@v4
