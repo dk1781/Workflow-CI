@@ -9,6 +9,7 @@ from sklearn.metrics import (
 )
 import mlflow
 import mlflow.sklearn
+from mlflow.models.signature import infer_signature
 import dagshub
 from dotenv import load_dotenv
 
@@ -49,17 +50,16 @@ def modelling_with_tuning(data_path):
         "roc_auc": roc_auc_score(y_test, y_proba),
         "log_loss": log_loss(y_test, y_proba)
     }
-    return search, search.best_params_, metrics, (y_test, y_pred, y_proba)
-
+    return search, search.best_params_, metrics, X_test
 if __name__ == "__main__":
     # konfigurasu dagshub
-    """load_dotenv()
+    load_dotenv()
     dagshub_username = os.getenv('DAGSHUB_USERNAME')
     dagshub_token = os.getenv('DAGSHUB_TOKEN')
     
     if not dagshub_username or not dagshub_token:
         raise ValueError("DAGSHUB_USERNAME atau DAGSHUB_TOKEN tidak terdeteksi!")
-    
+    """
     dagshub.init(
         repo_owner='dk1781',
         repo_name='heart_attack_mlflow',
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         username=dagshub_username,
         password=dagshub_token
     )"""
-    mlflow.set_tracking_uri("file://" + os.path.abspath("mlruns"))
+    mlflow.set_tracking_uri("https://dagshub.com/dk1781/heart_attack_mlflow.mlflow"))
     mlflow.set_experiment("HeartAttack_tuning")
 
     with mlflow.start_run(run_name="Modelling_tuning_manuallog"):
@@ -79,6 +79,9 @@ if __name__ == "__main__":
             mlflow.log_metric(k, v)
 
         # log model
-        mlflow.sklearn.log_model(model, "randomforest_bestmodel")
-
-        
+        signature = infer_signature(X_test, model.predict(X_test))
+        mlflow.sklearn.log_model(
+            model,
+            artifact_path="randomforest_bestmodel",
+            signature=signature,
+        )
