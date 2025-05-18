@@ -59,14 +59,14 @@ if __name__ == "__main__":
     
     if not dagshub_username or not dagshub_token:
         raise ValueError("DAGSHUB_USERNAME atau DAGSHUB_TOKEN tidak terdeteksi!")
-    
+    """ 
     dagshub.init(
         repo_owner='dk1781',
         repo_name='heart_attack_mlflow',
         mlflow=True,
         username=dagshub_username,
         password=dagshub_token
-    )
+    )"""
     mlflow.set_experiment("HeartAttack_tuning")
 
     with mlflow.start_run(run_name="Modelling_tuning_manuallog"):
