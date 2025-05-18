@@ -52,6 +52,8 @@ def modelling_with_tuning(data_path):
     return search, search.best_params_, metrics, (y_test, y_pred, y_proba)
 
 if __name__ == "__main__":
+
+    mlflow.set_tracking_uri("file://" + os.path.abspath("mlruns"))
     mlflow.set_experiment("HeartAttack_tuning")
 
     with mlflow.start_run(run_name="Modelling_tuning_manuallog1"):
