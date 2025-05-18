@@ -52,10 +52,6 @@ def modelling_with_tuning(data_path):
     return search, search.best_params_, metrics, (y_test, y_pred, y_proba)
 
 if __name__ == "__main__":
-    # konfigurasi DagsHub
-    dagshub.init(repo_owner='dk1781',
-             repo_name='heart_attack_mlflow',
-             mlflow=True)
     mlflow.set_experiment("HeartAttack_tuning")
 
     with mlflow.start_run(run_name="Modelling_tuning_manuallog1"):
