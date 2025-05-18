@@ -51,25 +51,26 @@ def modelling_with_tuning(data_path):
         "log_loss": log_loss(y_test, y_proba)
     }
     return search, search.best_params_, metrics, X_test
-if __name__ == "__main__":
+
+
+
+if name == "main":
+
     # konfigurasu dagshub
     load_dotenv()
     dagshub_username = os.getenv('DAGSHUB_USERNAME')
     dagshub_token = os.getenv('DAGSHUB_TOKEN')
-    
     if not dagshub_username or not dagshub_token:
         raise ValueError("DAGSHUB_USERNAME atau DAGSHUB_TOKEN tidak terdeteksi!")
-    """
-    dagshub.init(
-        repo_owner='dk1781',
-        repo_name='heart_attack_mlflow',
-        mlflow=True,
-        username=dagshub_username,
-        password=dagshub_token
-    )"""
-    mlflow.set_tracking_uri("https://dagshub.com/dk1781/heart_attack_mlflow.mlflow"))
+    # Konfigurasi MLflow dengan autentikasi
+    mlflow.set_tracking_uri("https://dagshub.com/dk1781/heart_attack_mlflow.mlflow")
     mlflow.set_experiment("HeartAttack_tuning")
-
+    # Tambahkan header autentikasi
+    headers = {"Authorization": f"Bearer {dagshub_token}"}
+    client = mlflow.tracking.MlflowClient(
+        tracking_uri="https://dagshub.com/dk1781/heart_attack_mlflow.mlflow",
+        headers=headers
+    )
     with mlflow.start_run(run_name="Modelling_tuning_manuallog"):
         model, best_params, metrics, preds = modelling_with_tuning("heart_preprocessed.csv")
         # log params & metrics
@@ -77,11 +78,11 @@ if __name__ == "__main__":
             mlflow.log_param(k, v)
         for k,v in metrics.items():
             mlflow.log_metric(k, v)
-
         # log model
-        signature = infer_signature(X_test, model.predict(X_test))
+        signature = infer_signature(preds, model.predict(preds))
         mlflow.sklearn.log_model(
             model,
             artifact_path="randomforest_bestmodel",
             signature=signature,
         )
+
