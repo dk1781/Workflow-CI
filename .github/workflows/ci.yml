@@ -48,11 +48,23 @@ jobs:
           mlflow run MLProject --env-manager=local -P data_path="$DATA_PATH"
       # 6. Get latest run_id
       - name: Get latest MLflow run_id
-        id: get_run
         run: |
-          RUN_ID=$(ls -td mlruns/0/*/ | head -n 1 | cut -d'/' -f3)
-          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
-          echo "Latest run_id: $RUN_ID"
+          echo "Getting latest run ID..."
+          python <<EOF
+          import mlflow
+          client = mlflow.tracking.MlflowClient()
+          experiment = client.get_experiment_by_name("${{ env.EXPERIMENT_NAME }}")
+          if experiment is None:
+            raise Exception("Experiment not found.")
+          runs = client.search_runs(experiment_ids=[experiment.experiment_id], order_by=["start_time DESC"])
+          if not runs:
+            raise Exception("No runs found in the experiment.")
+          run_id = runs[0].info.run_id
+          print(f"Latest run ID: {run_id}")
+          with open("${GITHUB_ENV}", "a") as f:
+            f.write(f"RUN_ID={run_id}\n")
+          EOF
+
 
           
       - name: Download Model Artifact from MLflow
