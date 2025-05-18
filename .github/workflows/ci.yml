@@ -11,6 +11,9 @@ on:
 env:
   EXPERIMENT_NAME: HeartAttack_tuning
   DATA_PATH: MLProject/heart_preprocessed.csv
+  MLFLOW_TRACKING_URI: "https://dagshub.com/dk1781/heart_attack_mlflow.mlflow"
+  DAGSHUB_USERNAME: "dk1781"  
+  DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
 
 jobs:
   build:
@@ -19,7 +22,7 @@ jobs:
       DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-
+      
     steps:
       # 1. Checkout repo
       - name: Checkout code
