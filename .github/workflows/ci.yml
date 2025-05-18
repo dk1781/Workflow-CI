@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  MLFLOW_TRACKING_URI: https://dagshub.com/dk1781/heart_attack_mlflow/
+  MLFLOW_TRACKING_URI: https://dagshub.com/dk1781/heart_attack_mlflow.mlflow/
   EXPERIMENT_NAME: HeartAttack_tuning
   DATA_PATH: MLProject/heart_preprocessed.csv
   MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
