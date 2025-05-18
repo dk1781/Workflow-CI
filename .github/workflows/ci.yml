@@ -9,16 +9,16 @@ on:
       - main
 
 env:
-  MLFLOW_TRACKING_URI: file:///mlruns
+  MLFLOW_TRACKING_URI: https://dagshub.com/dk1781/heart_attack_mlflow/settings/integrations/
   EXPERIMENT_NAME: HeartAttack_tuning
   DATA_PATH: MLProject/heart_preprocessed.csv
+  MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
+  MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env: 
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
     steps:
       # 1. Checkout repo
@@ -26,21 +26,22 @@ jobs:
         uses: actions/checkout@v4
 
       # 2. Setup Python 3.12.7
-      - name: Set up Python 3.12.7
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12.7"
+          python-version: "3.12"
 
       # 3. Check environment vars
       - name: Check Env
         run: |
-          echo "EXPERIMENT_NAME=$EXPERIMENT_NAME"
           echo "DATA_PATH=$DATA_PATH"
       # 4. Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas scikit-learn mlflow dagshub
+          pip instal mlflow
+          pip install dotenv
+          
       # 5. Run MLflow Project (ini akan menjalankan MLProject/modelling.py via MLproject spec)
       - name: Run mlflow project
         run: |
