@@ -10,7 +10,7 @@ from sklearn.metrics import (
 import mlflow
 import mlflow.sklearn
 import dagshub
-
+from dotenv import load_dotenv
 
 
 def modelling_with_tuning(data_path):
@@ -52,8 +52,13 @@ def modelling_with_tuning(data_path):
     return search, search.best_params_, metrics, (y_test, y_pred, y_proba)
 
 if __name__ == "__main__":
+    load_dotenv()
+    username = os.getenv("MLFLOW_TRACKING_USERNAME")
+    password = os.getenv("MLFLOW_TRACKING_PASSWORD")
+    if not username or not password:
+        raise EnvironmentError("MLFLOW_TRACKING_USERNAME dan MLFLOW_TRACKING_PASSWORD harus di-set sebagai environment variable")
 
-    mlflow.set_tracking_uri("file://" + os.path.abspath("mlruns"))
+    mlflow.set_tracking_uri("https://dagshub.com/dk1781/heart_attack_mlflow/")
     mlflow.set_experiment("HeartAttack_tuning")
 
     with mlflow.start_run(run_name="Modelling_tuning_manuallog1"):
