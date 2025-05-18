@@ -44,8 +44,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas scikit-learn mlflow dagshub
-
+          pip install mlflow
+          pip install python-dotenv
 
     # 5. Configure MLflow with Authentication
       - name: Configure MLflow
