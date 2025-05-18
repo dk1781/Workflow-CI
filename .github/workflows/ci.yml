@@ -53,12 +53,18 @@ jobs:
           RUN_ID=$(ls -td mlruns/0/*/ | head -n 1 | cut -d'/' -f3)
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Latest run_id: $RUN_ID"
+      - name: Download Model Artifact from MLflow
+        run: |
+          mlflow artifacts download \
+            --run-id $RUN_ID \
+            --artifact-path randomforest_bestmodel \
+            --dst-path downloaded_artifact
       # 7. Upload MLflow artifacts (opsional, tapi memenuhi Skilled)
       - name: Upload MLflow artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mlflow-artifacts-${{ env.RUN_ID }}
-          path: mlruns/0/${{ env.RUN_ID }}
+          name: randomforest_model_artifact
+          path: downloaded_artifact/
 
       # 8. Build Docker Model
       - name: Build Docker Model
