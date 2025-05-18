@@ -37,8 +37,7 @@ jobs:
       # 3. Check environment vars
       - name: Check Env
         run: |
-          echo "EXPERIMENT_NAME=$EXPERIMENT_NAME"
-          echo "DATA_PATH=$DATA_PATH"
+          echo $DATA_PATH
 
       # 4. Install dependencies
       - name: Install dependencies
@@ -50,7 +49,7 @@ jobs:
       # 5. Run MLflow Project (ini akan menjalankan MLProject/modelling.py via MLproject spec)
       - name: Run mlflow project
         run: |
-          mlflow run MLProject --env-manager=local -P data_path="$DATA_PATH"
+          mlflow run MLProject --env-manager=local --run-name rf_run
 
       # 6. Get latest run_id
       - name: Get latest MLflow run_id
