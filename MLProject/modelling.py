@@ -10,7 +10,7 @@ from sklearn.metrics import (
 import mlflow
 import mlflow.sklearn
 import dagshub
-
+from dotenv import load_dotenv
 
 
 def modelling_with_tuning(data_path):
@@ -53,19 +53,20 @@ def modelling_with_tuning(data_path):
 
 if __name__ == "__main__":
     # konfigurasu dagshub
+    load_dotenv()
     dagshub_username = os.getenv('DAGSHUB_USERNAME')
     dagshub_token = os.getenv('DAGSHUB_TOKEN')
     
     if not dagshub_username or not dagshub_token:
         raise ValueError("DAGSHUB_USERNAME atau DAGSHUB_TOKEN tidak terdeteksi!")
-
+    """
     dagshub.init(
         repo_owner='dk1781',
         repo_name='heart_attack_mlflow',
         mlflow=True,
         username=dagshub_username,
         password=dagshub_token
-    )
+    )"""
     mlflow.set_experiment("HeartAttack_tuning")
 
     with mlflow.start_run(run_name="Modelling_tuning_manuallog"):
