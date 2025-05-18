@@ -54,7 +54,7 @@ def modelling_with_tuning(data_path):
 
 
 
-if name == "main":
+if __name__ == "main":
 
     # konfigurasu dagshub
     load_dotenv()
