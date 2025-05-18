@@ -53,9 +53,13 @@ def modelling_with_tuning(data_path):
 
 if __name__ == "__main__":
     # konfigurasi DagsHub
-    dagshub.init(repo_owner='dk1781',
-             repo_name='heart_attack_mlflow',
-             mlflow=True)
+    dagshub.init(
+        repo_owner='dk1781',               
+        repo_name='heart_attack_mlflow',
+        mlflow=True,
+        username=os.getenv('DAGSHUB_USERNAME'),
+        password=os.getenv('DAGSHUB_TOKEN')
+    )
     mlflow.set_experiment("HeartAttack_tuning")
 
     with mlflow.start_run(run_name="Modelling_tuning_manuallog"):
