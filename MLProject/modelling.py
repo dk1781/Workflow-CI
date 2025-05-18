@@ -9,6 +9,7 @@ from sklearn.metrics import (
 )
 import mlflow
 import mlflow.sklearn
+from mlflow.models.signature import infer_signature
 from dotenv import load_dotenv
 
 
@@ -48,7 +49,7 @@ def modelling_with_tuning(data_path):
         "roc_auc": roc_auc_score(y_test, y_proba),
         "log_loss": log_loss(y_test, y_proba)
     }
-    return search, search.best_params_, metrics, (y_test, y_pred, y_proba)
+    return search, search.best_params_, metrics, X_test
 
 if __name__ == "__main__":
     load_dotenv()
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     mlflow.set_experiment("HeartAttack_tuning")
 
     with mlflow.start_run(run_name="Modelling_tuning_manuallog1"):
-        model, best_params, metrics, preds = modelling_with_tuning("heart_preprocessed.csv")
+        model, best_params, metrics, X_test = modelling_with_tuning("heart_preprocessed.csv")
         # log params & metrics
         for k,v in best_params.items():
             mlflow.log_param(k, v)
@@ -69,4 +70,14 @@ if __name__ == "__main__":
             mlflow.log_metric(k, v)
 
         # log model
-        mlflow.sklearn.log_model(model, "randomforest_bestmodel")
+        input_example = X_test.iloc[:1]
+        signature = infer_signature(X_test, model.predict(X_test))
+
+        # Simpan model ke dalam MLflow dengan nama artifact rf_model
+        mlflow.sklearn.log_model(
+            model,
+            artifact_path="randomforest_bestmodel",
+            signature=signature,
+            input_example=input_example
+        )
+
