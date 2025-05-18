@@ -9,7 +9,6 @@ from sklearn.metrics import (
 )
 import mlflow
 import mlflow.sklearn
-import dagshub
 from dotenv import load_dotenv
 
 
