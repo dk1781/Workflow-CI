@@ -1,93 +1,111 @@
-name: CI MLflow
+name: Advanced MLflow CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 env:
   EXPERIMENT_NAME: HeartAttack_tuning
   DATA_PATH: MLProject/heart_preprocessed.csv
   MLFLOW_TRACKING_URI: "https://dagshub.com/dk1781/heart_attack_mlflow.mlflow"
-  DAGSHUB_USERNAME: "dk1781"  
-  DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env: 
+    env:
       DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-    steps:
-      # 1. Checkout repo
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      # 2. Setup Python 3.12.7
+    steps:
+      # 1. Set up job
+      - name: Set up job
+        run: echo "Job started"
+
+      # 2. Checkout code
+      - name: Run actions/checkout@v3
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # 3. Set up Python
       - name: Set up Python 3.12.7
         uses: actions/setup-python@v4
         with:
           python-version: "3.12.7"
+          cache: 'pip'
 
-      # 3. Check environment vars
+      # 4. Check environment variables
       - name: Check Env
         run: |
           echo "EXPERIMENT_NAME=$EXPERIMENT_NAME"
           echo "DATA_PATH=$DATA_PATH"
+          echo "MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI"
 
-      # 4. Install dependencies
+      # 5. Install system dependencies
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pandas scikit-learn mlflow dagshub
+          sudo apt-get update
+          sudo apt-get install -y unzip
 
-
-      # 5. Run MLflow Project (ini akan menjalankan MLProject/modelling.py via MLproject spec)
-      - name: Run mlflow project
+      # 6. Run MLflow project
+      - name: Run mflow project
         run: |
-          mlflow run MLProject --env-manager=local -P data_path="$DATA_PATH"
+          mlflow run MLProject \
+            --env-manager=local \
+            -P data_path="$DATA_PATH" \
+            --no-conda
+        env:
+          MLFLOW_TRACKING_USERNAME: dk1781
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
 
-      # 6. Get latest run_id
+      # 7. Get run ID
       - name: Get latest MLflow run_id
         id: get_run
         run: |
-          RUN_ID=$(ls -td mlruns/0/*/ | head -n 1 | cut -d'/' -f3)
+          RUN_ID=$(ls -td mlruns/0/*/ | head -n 1 | awk -F'/' '{print $3}')
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
-          echo "Latest run_id: $RUN_ID"
 
-      # 7. Upload MLflow artifacts (opsional, tapi memenuhi Skilled)
-      - name: Upload MLflow artifacts
+      # 8. Install Python dependencies
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install gdown  # Untuk upload ke Google Drive
+
+      # 9. Upload artifacts to GitHub
+      - name: Upload to GitHub
         uses: actions/upload-artifact@v4
         with:
           name: mlflow-artifacts-${{ env.RUN_ID }}
-          path: mlruns/0/${{ env.RUN_ID }}
+          path: |
+            mlruns/0/${{ env.RUN_ID }}/artifacts
+            mlruns/0/${{ env.RUN_ID }}/metrics
+            mlruns/0/${{ env.RUN_ID }}/params
 
-      # 8. Build Docker Model
+      # 10. Build Docker Model
       - name: Build Docker Model
         run: |
           mlflow models build-docker \
             --model-uri "runs:/${{ env.RUN_ID }}/randomforest_bestmodel" \
-            --name "heart-attack-ci"
+            --name "heart-attack-ci" \
+            --enable-mlserver
 
-      # 9. Login to Docker Hub
+      # 11. Login to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 10. Tag Docker Image
+      # 12. Tag Docker Image
       - name: Tag Docker Image
         run: |
           docker tag heart-attack-ci:latest ${{ secrets.DOCKERHUB_USERNAME }}/heart-attack-ci:latest
           docker tag heart-attack-ci:latest ${{ secrets.DOCKERHUB_USERNAME }}/heart-attack-ci:${{ github.run_id }}
 
-      # 11. Push Docker image to Docker Hub
+      # 13. Push Docker Image
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/heart-attack-ci:latest
