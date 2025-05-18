@@ -53,7 +53,7 @@ def modelling_with_tuning(data_path):
 
 if __name__ == "__main__":
     # konfigurasu dagshub
-    #load_dotenv()
+    load_dotenv()
     dagshub_username = os.getenv('DAGSHUB_USERNAME')
     dagshub_token = os.getenv('DAGSHUB_TOKEN')
     
