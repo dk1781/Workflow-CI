@@ -47,14 +47,7 @@ jobs:
           pip install mlflow
           pip install python-dotenv
 
-    # 5. Configure MLflow with Authentication
-      - name: Configure MLflow
-        run: |
-          export MLFLOW_TRACKING_URI="https://dagshub.com/dk1781/heart_attack_mlflow.mlflow"
-          export DAGSHUB_TOKEN="${DAGSHUB_TOKEN}"
-          export MLFLOW_TRACKING_USERNAME="${DAGSHUB_USERNAME}"
-          export MLFLOW_TRACKING_PASSWORD="${DAGSHUB_TOKEN}"
-  
+
 
       # 5. Run MLflow Project (ini akan menjalankan MLProject/modelling.py via MLproject spec)
       - name: Run mlflow project
