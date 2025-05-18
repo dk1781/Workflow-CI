@@ -1,4 +1,4 @@
-name: CI/CD MLflow
+name: CI MLflow
 
 on:
   push:
@@ -37,7 +37,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install pandas scikit-learn mlflow dagshub
+
 
       # 5. Run MLflow Project (ini akan menjalankan MLProject/modelling.py via MLproject spec)
       - name: Run mlflow project
