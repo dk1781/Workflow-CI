@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score,
     roc_auc_score, log_loss, f1_score
@@ -13,14 +13,13 @@ from mlflow.models.signature import infer_signature
 from dotenv import load_dotenv
 
 
-def modelling_with_tuning(data_path):
-    # load & split
-    df = pd.read_csv(data_path)
-    X = df.drop("HeartDisease", axis=1)
-    y = df["HeartDisease"]
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+def modelling_with_tuning(X_train_path, X_test_path, y_train_path, y_test_path):
+    
+    # Load data
+    X_train = pd.read_csv(X_train_path)
+    X_test = pd.read_csv(X_test_path)
+    y_train = pd.read_csv(y_train_path).squeeze()
+    y_test = pd.read_csv(y_test_path).squeeze()
     # hyperparameter tuning
     param_dist = {
         "n_estimators": [50, 100, 200, 400],
@@ -52,6 +51,10 @@ def modelling_with_tuning(data_path):
     return search, search.best_params_, metrics, X_test
 
 if __name__ == "__main__":
+    X_train_path = "heart_preprocessing/X_train.csv"
+    X_test_path = "heart_preprocessing/X_test.csv"
+    y_train_path = "heart_preprocessing/y_train.csv"
+    y_test_path = "heart_preprocessing/y_test.csv"
     load_dotenv()
     username = os.getenv("MLFLOW_TRACKING_USERNAME")
     password = os.getenv("MLFLOW_TRACKING_PASSWORD")
@@ -62,7 +65,7 @@ if __name__ == "__main__":
     mlflow.set_experiment("HeartAttack_tuning")
 
     with mlflow.start_run(run_name="Modelling_tuning_manuallog1"):
-        model, best_params, metrics, X_test = modelling_with_tuning("heart_preprocessed.csv")
+        model, best_params, metrics, X_test = modelling_with_tuning(X_train_path, X_test_path, y_train_path, y_test_path)
         # log params & metrics
         for k,v in best_params.items():
             mlflow.log_param(k, v)
